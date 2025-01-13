@@ -1,17 +1,26 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { convertToBase64 } from '../util/apiUtils'
 import './App.css'
 
 function App() {
+
+  const [fileState, setFileState] = useState(null)
+
+  const formSubmitHandler = (e) => {
+    e.preventDefault()
+    console.log("balls")
+    console.log(fileState)
+    convertToBase64(document.querySelector("#file-input").files[0])
+  }
 
   return (
     <>
       <h1>ERG Sprints Spreadsheet Utility</h1>
       <div className="card">
-        <form>
-          <label for="file-input">Input File: </label>
-          <input type="file" id="file-input" />
+        <form id="main-form" onSubmit={formSubmitHandler}>
+          <label htmlFor="file-input">Input File: </label>
+          <input onChange={() => setFileState(document.querySelector("#file-input").value)} type="file" id="file-input" name="file-input" />
+          <button type="submit">Generate Entries</button>
         </form>
       </div>
       <p className="read-the-docs">
