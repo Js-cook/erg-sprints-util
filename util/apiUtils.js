@@ -3,6 +3,6 @@ export function convertToBase64(file){
     console.log(typeof(file))
     reader.readAsDataURL(file)
     reader.onload = () => {
-        console.log(reader.result)
+        return reader.result
     }
 }

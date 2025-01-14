@@ -6,11 +6,21 @@ function App() {
 
   const [fileState, setFileState] = useState(null)
 
-  const formSubmitHandler = (e) => {
+  const formSubmitHandler = async(e) => {
     e.preventDefault()
     console.log("balls")
     console.log(fileState)
-    convertToBase64(document.querySelector("#file-input").files[0])
+    let encodedFile = convertToBase64(document.querySelector("#file-input").files[0])
+    await fetch("https://erg-sprints-util-iaz4lsc12-js-cooks-projects.vercel.app/", {
+      headers: {
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Access-Control-Allow-Origin": "*"
+      },
+      mode: "no-cors",
+      method: "POST",
+      body: JSON.stringify({"inputFile": encodedFile})
+    })
   }
 
   return (
