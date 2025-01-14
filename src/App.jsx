@@ -1,28 +1,51 @@
 import { useState } from 'react'
-import { convertToBase64 } from '../util/apiUtils'
 import './App.css'
 
 function App() {
 
   const [fileState, setFileState] = useState(null)
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [downloadHref, setDownloadHref] = useState(null)
 
   const formSubmitHandler = async(e) => {
     e.preventDefault()
-    console.log("balls")
-    console.log(fileState)
-    let encodedFile = convertToBase64(document.querySelector("#file-input").files[0])
-    const resp = await fetch("https://erg-sprints-util-iaz4lsc12-js-cooks-projects.vercel.app/", {
-      headers: {
-        "Accept": "*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Access-Control-Allow-Origin": "*"
-      },
-      mode: "no-cors",
-      method: "POST",
-      body: JSON.stringify({"inputFile": encodedFile})
-    })
+    let reader = new FileReader()
+    reader.readAsDataURL(document.querySelector("#file-input").files[0])
+    reader.onload = async() => {
+        // return reader.result
+        // console.log(reader.result)
+        const resp = await fetch("https://erg-sprints-util-api.vercel.app/", {
+          headers: {
+            "Accept": "*/*",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          },
+          // mode: "no-cors",
+          method: "POST",
+          body: JSON.stringify({"inputFile": reader.result.split(",")[1]})
+        })
+        // console.log(await resp.json())
+        const data = await resp.json()
+        console.log(data["data"])
+        generateDownloadableFile(data["data"])
+        setFormSubmitted(true)
+    }
+  }
 
-    console.log(await resp.json())
+  const generateDownloadableFile = (base64String) => {
+    const byteCharacters = atob(base64String);
+    const byteArray = new Uint8Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i)
+    }
+    
+    const blob = new Blob([byteArray], { type: 'application/octet-stream' })
+
+    // Create a download link
+    const link = document.getElementById("download-link")
+    setDownloadHref(URL.createObjectURL(blob))
+    // link.href = URL.createObjectURL(blob)
+    // link.download = "race-entries.csv"
   }
 
   return (
@@ -38,6 +61,9 @@ function App() {
       <p className="read-the-docs">
         NOTE: Program assumes correctly formatted input spreadsheet.
       </p>
+      {formSubmitted &&
+        <h2><a id="download-link" href={downloadHref} download="race-entries.csv">race-entries.csv</a></h2>
+      }
     </>
   )
 }
