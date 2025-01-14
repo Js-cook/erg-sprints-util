@@ -11,7 +11,7 @@ function App() {
     console.log("balls")
     console.log(fileState)
     let encodedFile = convertToBase64(document.querySelector("#file-input").files[0])
-    await fetch("https://erg-sprints-util-iaz4lsc12-js-cooks-projects.vercel.app/", {
+    const resp = await fetch("https://erg-sprints-util-iaz4lsc12-js-cooks-projects.vercel.app/", {
       headers: {
         "Accept": "*/*",
         "Content-Type": "application/x-www-form-urlencoded",
@@ -21,6 +21,8 @@ function App() {
       method: "POST",
       body: JSON.stringify({"inputFile": encodedFile})
     })
+
+    console.log(await resp.json())
   }
 
   return (
